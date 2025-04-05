@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Alert, Box, Button, TextField } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import axios from 'axios';
@@ -20,7 +20,7 @@ const StoreRegister = () => {
     user_id: params.user_id
   })
 
-  const [error, seterror] = useState({})
+  const [error, seterror] = useState()
 
   console.log(form);
 
@@ -46,17 +46,31 @@ const StoreRegister = () => {
       setform({ name: "", email: "", address: "" })
       navigate("/login")
     }
-
-
   };
+
+  useEffect(()=>{
+    let user = JSON.parse(localStorage.getItem('user'))
+
+    console.log(user);
+
+    if(!params.user_id){
+      navigate('/sign')
+    }
+  })
 
 
   return (
-    <div>
+    <div style={{display:'flex', flexDirection:'column', alignItems:'center', justifyContent:"center", height:'100vh'}}>
       <h1>Store Register</h1>
 
+      {
+        error?.mess ?
+          <Alert severity={error?.success ? 'success' : 'error'}>{error?.mess}</Alert>
+          : null
+      }
 
-      <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "20px", width:'50vw' }}>
         <TextField
           id="outlined-basic"
           label="Name"

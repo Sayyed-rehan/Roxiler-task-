@@ -23,7 +23,7 @@ const AdministratorDashboard = () => {
 
     const [countOfAllTables, setcountOfAllTables] = useState({})
 
-    const [url, seturl] = useState("")
+    const [url, seturl] = useState(`http://localhost:5000/allusers?name=${apiParams.name}&email=${apiParams.email}&role=${apiParams.role}&address=${apiParams.address}`)
 
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -75,63 +75,73 @@ const AdministratorDashboard = () => {
 
     console.log(url);
 
+    useEffect(()=>{
+        let user = JSON.parse(localStorage.getItem('user'))
+    
+        console.log(user);
+    
+        if(!user){
+            navigate("/login")
+        }
+      })
+
     return (
         <div>
             <h1>System Administrator</h1>
 
-            <Box sx={{ display: "flex", gap: "2vw" }}>
-                <TextField
-                    id="outlined-basic"
-                    label="Name"
-                    name="name"
-                    variant="outlined"
-                    value={apiParams.name}
-                    onChange={handleChange}
-                />
+            <Box sx={{ display: "flex", justifyContent: "space-between", gap: "2vw" }}>
+                <Box sx={{display:"flex", gap:'15px', ml:"20px"}}>
 
-                <TextField
-                    id="outlined-basic"
-                    label="Email"
-                    name="email"
-                    variant="outlined"
-                    value={apiParams.email}
-                    onChange={handleChange}
-                />
+                    <TextField
+                        id="outlined-basic"
+                        label="Name"
+                        name="name"
+                        variant="outlined"
+                        value={apiParams.name}
+                        onChange={handleChange}
+                    />
 
-                <TextField
-                    id="outlined-basic"
-                    label="Address"
-                    name="address"
-                    variant="outlined"
-                    value={apiParams.address}
-                    onChange={handleChange}
-                />
+                    <TextField
+                        id="outlined-basic"
+                        label="Email"
+                        name="email"
+                        variant="outlined"
+                        value={apiParams.email}
+                        onChange={handleChange}
+                    />
 
-                <FormControl sx={{width:'200px'}}>
-                    <InputLabel id="demo-simple-select-label">Role</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={apiParams.role}
-                        label="Role"
-                        onChange={(e)=>setapiParams({...apiParams, role:e.target.value})}
-                    >
-                        <MenuItem value=''>Select From Below</MenuItem>
+                    <TextField
+                        id="outlined-basic"
+                        label="Address"
+                        name="address"
+                        variant="outlined"
+                        value={apiParams.address}
+                        onChange={handleChange}
+                    />
 
-                        <MenuItem value='User'>User</MenuItem>
-                        <MenuItem value='Owner'>Store Owner</MenuItem>
-                    </Select>
-                </FormControl>
+                    <FormControl sx={{ width: '200px' }}>
+                        <InputLabel id="demo-simple-select-label">Role</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={apiParams.role}
+                            label="Role"
+                            onChange={(e) => setapiParams({ ...apiParams, role: e.target.value })}
+                        >
+                            <MenuItem value=''>Select From Below</MenuItem>
 
-
-
-                <Avatar sx={{ bgcolor: "#673ab7", cursor: 'pointer' }}
+                            <MenuItem value='User'>User</MenuItem>
+                            <MenuItem value='Owner'>Store Owner</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Avatar sx={{ bgcolor: "#673ab7", cursor: 'pointer', mr:"20px" }}
                     aria-controls={open ? 'account-menu' : undefined}
                     aria-haspopup="true"
                     aria-expanded={open ? 'true' : undefined}
                     onClick={handleMenuClick}
                 >
-                    {user[0].name[0].toUpperCase()}
+                    { user && user[0].name[0].toUpperCase()}
                 </Avatar>
                 <Menu
                     anchorEl={anchorEl}

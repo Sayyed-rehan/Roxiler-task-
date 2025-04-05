@@ -5,7 +5,7 @@ const userTableQuery = `CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(60) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     address VARCHAR(400) NOT NULL,
-    password VARCHAR(8) NOT NULL,
+    password VARCHAR(16) NOT NULL,
     role ENUM('Administrator', 'User', 'Owner') NOT NULL
 )`;
 

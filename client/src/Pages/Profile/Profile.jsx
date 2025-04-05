@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Button, Divider, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 const Profile = () => {
 
+
+    const navigate = useNavigate()
 
     const [password, setpassword] = useState("")
     // console.log(password);
@@ -94,25 +97,35 @@ const Profile = () => {
 
     }, [userData, user])
 
+    useEffect(()=>{
+        let user = JSON.parse(localStorage.getItem('user'))
+    
+        console.log(user);
+    
+        if(!user){
+            navigate("/login")
+        }
+      })
+
     return (
         <div style={{display:'flex', flexDirection:'column' ,justifyContent:"space-around", alignItems:'center', marginTop:"20px"}}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: "5vh", width: '30vw', p: "20px", mb: '20px', bgcolor:'#eceff1', borderRadius:"15px" }}>
-                <Typography>Name: {userData[0]?.name || null}
+                <Typography>Name: {user && userData[0]?.name || null}
                     <Divider />
                 </Typography>
-                <Typography>Email: {userData[0]?.email || null}
-                    <Divider />
-                </Typography>
-
-                <Typography>Address: {userData[0]?.address || null}
+                <Typography>Email: {user && userData[0]?.email || null}
                     <Divider />
                 </Typography>
 
-                <Typography>Role: {userData[0]?.role || null}
+                <Typography>Address: {user && userData[0]?.address || null}
                     <Divider />
                 </Typography>
 
-                <Typography>Password: {userData[0]?.password || null}
+                <Typography>Role: {user && userData[0]?.role || null}
+                    <Divider />
+                </Typography>
+
+                <Typography>Password: {user && userData[0]?.password || null}
                     <Divider />
                 </Typography>
 
@@ -122,7 +135,7 @@ const Profile = () => {
             </Box>
 
             {/* Add Users */}
-            <Box sx={{ display: user[0].role =='Administrator'?'flex':'none', flexDirection: 'column', gap: "10px", p: "20px", bgcolor:'#eceff1', borderRadius:'15px' }} width='600px'>
+            <Box sx={{ display: user && user[0].role =='Administrator'?'flex':'none', flexDirection: 'column', gap: "10px", p: "20px", bgcolor:'#eceff1', borderRadius:'15px' }} width='600px'>
             <h1>ADD USER</h1>
                 <TextField placeholder='Name' name='name' value={userForm.name} onChange={handleInputChange}></TextField>
                 <TextField placeholder='Email' name='email' value={userForm.email} onChange={handleInputChange}></TextField>
@@ -137,6 +150,8 @@ const Profile = () => {
                 >
                     <MenuItem value='User'>User</MenuItem>
                     <MenuItem value='Owner'>Store Owner</MenuItem>
+                    <MenuItem value='Administrator'>Admin</MenuItem>
+
                 </Select>
                 <TextField placeholder='Password' name='password' type='password' value={userForm.password} onChange={handleInputChange}></TextField>
                 <Button variant='contained' onClick={handleAddUser}>Add User</Button>

@@ -163,11 +163,15 @@ app.patch("/update", async (req, res) => {
 app.post("/create_store", async (req, res) => {
     const { name, email, address, user_id } = req.body;
 
+    console.log(req.body);
+
     try {
-        let data = await pool.execute(`
+        const [data] = await pool.execute(`
             insert into stores(name, email, address, user_id)
             values('${name}', '${email}', '${address}', '${user_id}')
         `);
+
+        console.log(data);
 
         res.json({
             success: true,
@@ -348,9 +352,18 @@ app.get("/get_ratings/:owner_id", async (req, res) => {
         where u.id = ${owner_id})
        `);
 
+       const [avg_rating] = await pool.execute(`
+        select *
+        from rolex.users as u
+        join rolex.stores as s
+        on u.id = s.user_id
+        where u.id = ${owner_id}
+       `)
+
         res.json({
             success: true,
             data: data,
+            avg_rating: avg_rating[0]
         });
     } catch (error) {
         console.log(error);

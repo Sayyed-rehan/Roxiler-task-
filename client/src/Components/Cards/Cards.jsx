@@ -10,7 +10,6 @@ import {
     Typography,
 } from "@mui/material";
 import axios from "axios";
-
 const Cards = (props) => {
     // console.log(props.store_data.id);
 
@@ -24,6 +23,7 @@ const Cards = (props) => {
     const handleRating = async () => {
         // let user = JSON.parse(localStorage.getItem("user"));
         // console.log(user[0]);
+
 
         let data = await axios.post("http://localhost:5000/submit_rating", {
             user_id: user[0].id,
@@ -82,13 +82,15 @@ const Cards = (props) => {
     useEffect(()=>{
         fetchRatingsByUser()
     },[])
+
+    
     
     // console.log(ratingGiventoStore)
    
     
     let findStore = ratingGiventoStore.find((item)=>item.store_id  == props.store_data.id)
     let findStoreBoolean = Boolean(findStore)
-    // console.log('filter',findStoreBoolean);
+    console.log('filter',findStore);
 
 
     return (
@@ -116,6 +118,7 @@ const Cards = (props) => {
                         size="small"
                         variant="contained"
                         onClick={() => setratingModal(!ratingModal)}
+                        sx={{display: user && user[0].role=='User'? 'block':'none'}}
                     >
                         Rating
                     </Button>
@@ -123,7 +126,7 @@ const Cards = (props) => {
                         <Box sx={{ display: "flex", flexDirection: "column", justifyContent:'space-between', gap:'0.5vw' }}>
                             <Rating
                                 name="size-large"
-                                defaultValue={0}
+                                defaultValue={findStoreBoolean ? +findStore?.rating : 0}
                                 size="large"
                                 onChange={handleRatingChange}
                             />
