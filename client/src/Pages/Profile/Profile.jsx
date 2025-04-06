@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Button, Divider, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Divider, InputLabel, MenuItem, Select, Stack, TextField, Typography, useForkRef } from "@mui/material";
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import validator from 'validator';
+
 
 const Profile = () => {
 
@@ -13,6 +15,8 @@ const Profile = () => {
 
     let user = JSON.parse(localStorage.getItem('user'))
     const [userData, setuserData] = useState(user)
+  const [error, seterror] = useState({})
+
 
     const [userForm, setuserForm] = useState({
         name: "",
@@ -28,6 +32,13 @@ const Profile = () => {
         address: "",
         user_id: 0
     })
+
+    let codn = { minLength: 8, minUppercase: 1, minSymbols: 1, returnScore: false, pointsPerUnique: 1, pointsPerRepeat: 0.5, pointsForContainingLower: 10, pointsForContainingUpper: 10, pointsForContainingNumber: 10, pointsForContainingSymbol: 10 }
+    const checkPassword = userForm.password ? validator.isStrongPassword(userForm.password, codn) : true
+    const emailCheck = userForm.email ? validator.isEmail(userForm.email) : true
+    const checkName = userForm.name ? validator.isAlpha(userForm.name, 'en-IN', { ignore: '\s' }) : true
+
+    console.log('checkPassword', checkPassword, emailCheck, checkName);
 
 
     const handleUpdatePassword = async () => {
@@ -57,12 +68,14 @@ const Profile = () => {
         })
 
         console.log(data.data);
+        seterror(data.data)
+
 
         if (data.data.success) {
 
             if (userForm.role == 'Owner') {
                 setstoreform({ ...storeform, user_id: data?.data?.data?.insertId })
-            }else{
+            } else {
                 setuserForm({ name: "", email: "", address: "", password: "", role: "" })
             }
         }
@@ -82,10 +95,10 @@ const Profile = () => {
 
         console.log(data.data);
 
-        if(data.data.success){
+        if (data.data.success) {
             setuserForm({ name: "", email: "", address: "", password: "", role: "" })
             setstoreform({ name: "", email: "", address: "" })
-            
+
         }
     }
 
@@ -97,19 +110,19 @@ const Profile = () => {
 
     }, [userData, user])
 
-    useEffect(()=>{
+    useEffect(() => {
         let user = JSON.parse(localStorage.getItem('user'))
-    
+
         console.log(user);
-    
-        if(!user){
+
+        if (!user) {
             navigate("/login")
         }
-      })
+    })
 
     return (
-        <div style={{display:'flex', flexDirection:'column' ,justifyContent:"space-around", alignItems:'center', marginTop:"20px"}}>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: "5vh", width: '30vw', p: "20px", mb: '20px', bgcolor:'#eceff1', borderRadius:"15px" }}>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: "space-around", alignItems: 'center', marginTop: "20px" }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "5vh", width: '30vw', p: "20px", mb: '20px', bgcolor: '#eceff1', borderRadius: "15px" }}>
                 <Typography>Name: {user && userData[0]?.name || null}
                     <Divider />
                 </Typography>
@@ -135,10 +148,18 @@ const Profile = () => {
             </Box>
 
             {/* Add Users */}
-            <Box sx={{ display: user && user[0].role =='Administrator'?'flex':'none', flexDirection: 'column', gap: "10px", p: "20px", bgcolor:'#eceff1', borderRadius:'15px' }} width='600px'>
-            <h1>ADD USER</h1>
-                <TextField placeholder='Name' name='name' value={userForm.name} onChange={handleInputChange}></TextField>
-                <TextField placeholder='Email' name='email' value={userForm.email} onChange={handleInputChange}></TextField>
+            <Box sx={{ display: user && user[0].role == 'Administrator' ? 'flex' : 'none', flexDirection: 'column', gap: "10px", p: "20px", bgcolor: '#eceff1', borderRadius: '15px' }} width='600px'>
+
+
+                <h1>ADD USER</h1>
+
+                {
+                    error.mess ?
+                        <Alert severity={error?.success ? 'success' : 'error'}>{error?.mess}</Alert>
+                        : null
+                }
+                <TextField placeholder='Name' name='name' value={userForm.name} onChange={handleInputChange} error={checkName == false}></TextField>
+                <TextField placeholder='Email' name='email' value={userForm.email} onChange={handleInputChange} error={emailCheck == false}></TextField>
                 <TextField placeholder='Address' name='address' value={userForm.address} onChange={handleInputChange}></TextField>
                 <InputLabel id="demo-simple-select-label">Role</InputLabel>
                 <Select
@@ -154,7 +175,10 @@ const Profile = () => {
 
                 </Select>
                 <TextField placeholder='Password' name='password' type='password' value={userForm.password} onChange={handleInputChange}></TextField>
-                <Button variant='contained' onClick={handleAddUser}>Add User</Button>
+                <Button variant='contained' onClick={handleAddUser}
+                    disabled={emailCheck === false || checkName == false || checkPassword == false || userForm.password.length > 16}>
+                    Add User
+                </Button>
             </Box>
 
             {
@@ -162,7 +186,7 @@ const Profile = () => {
                     ? <>
                         <h1>ADD Stores</h1>
 
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: "10px",p:'20px' ,bgcolor:'#eceff1', borderRadius:'15px', mb:"20px" }} width='600px'>
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: "10px", p: '20px', bgcolor: '#eceff1', borderRadius: '15px', mb: "20px" }} width='600px'>
                             <TextField
                                 id="outlined-basic"
                                 label="Name"

@@ -99,7 +99,7 @@ const Sign = () => {
         />
         <TextField
           id="outlined-basic"
-          label="Emial"
+          label="Email"
           name="email"
           variant="outlined"
           value={form.email}

@@ -339,20 +339,32 @@ app.get("/get_ratings/:owner_id", async (req, res) => {
     console.log("owner", owner_id);
     try {
         const [data] = await pool.execute(`
-        select *
-        from rolex.users as uu
-        join rolex.ratings as rr
-        on rr.user_id = uu.id
-        where uu.id in  (select r.user_id
-        from rolex.users as u
-        join rolex.stores as s
-        on s.user_id = u.id
-        join rolex.ratings as r
-        on r.store_id = s.id
-        where u.id = ${owner_id})
+    
+
+            SELECT *
+            FROM rolex.users AS uu
+            JOIN rolex.ratings AS rr
+            ON rr.user_id = uu.id
+            WHERE uu.id IN (
+                SELECT r.user_id
+                FROM rolex.users AS u
+                JOIN rolex.stores AS s
+                ON s.user_id = u.id
+                JOIN rolex.ratings AS r
+                ON r.store_id = s.id
+                WHERE u.id = "${owner_id}"
+            )
+            AND rr.store_id IN (
+                SELECT s.id
+                FROM rolex.stores AS s
+                JOIN rolex.users AS u
+                ON s.user_id = u.id
+                WHERE u.id = "${owner_id}"
+            )
+
        `);
 
-       const [avg_rating] = await pool.execute(`
+        const [avg_rating] = await pool.execute(`
         select *
         from rolex.users as u
         join rolex.stores as s
@@ -414,10 +426,10 @@ app.get("/get_count_of_all_tables", async (req, res) => {
 
     res.json({
         success: true,
-        data : {
+        data: {
             users: users[0].users,
-            stores:stores[0].stores,
-            ratings:ratings[0].ratings
+            stores: stores[0].stores,
+            ratings: ratings[0].ratings
         }
     });
 });
